@@ -1,103 +1,195 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import React, { useEffect, useState, useRef } from "react";
+
+const CuteMovingImagesPage = () => {
+  const [positions, setPositions] = useState([]);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const audioRef = useRef(null);
+
+  useEffect(() => {
+    // Responsive number of images based on screen size
+    const imageCount = 15;
+
+    const initialPositions = Array.from({ length: imageCount }, (_, i) => ({
+      id: i,
+      x: Math.random() * 90, // % of viewport width
+      y: Math.random() * 90, // % of viewport height
+      speedX: (Math.random() - 0.5) * 0.6, // slower for better performance
+      speedY: (Math.random() - 0.5) * 0.6,
+      rotation: Math.random() * 360,
+      rotationSpeed: (Math.random() - 0.5) * 1.5,
+      scale: 0.4 + Math.random() * 0.4, // slightly smaller
+    }));
+
+    setPositions(initialPositions);
+
+    const interval = setInterval(() => {
+      setPositions((prevPositions) =>
+        prevPositions.map((pos) => {
+          let newX = pos.x + pos.speedX;
+          let newY = pos.y + pos.speedY;
+
+          // Bounce off edges
+          let newSpeedX = pos.speedX;
+          let newSpeedY = pos.speedY;
+
+          if (newX <= 0 || newX >= 90) {
+            newSpeedX = -newSpeedX;
+            newX = Math.max(0, Math.min(90, newX));
+          }
+
+          if (newY <= 0 || newY >= 90) {
+            newSpeedY = -newSpeedY;
+            newY = Math.max(0, Math.min(90, newY));
+          }
+
+          const newRotation = (pos.rotation + pos.rotationSpeed) % 360;
+
+          return {
+            ...pos,
+            x: newX,
+            y: newY,
+            speedX: newSpeedX,
+            speedY: newSpeedY,
+            rotation: newRotation,
+          };
+        })
+      );
+    }, 50);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const togglePlay = () => {
+    if (audioRef.current) {
+      if (isPlaying) {
+        audioRef.current.pause();
+      } else {
+        audioRef.current
+          .play()
+          .catch((e) => console.log("Audio playback prevented:", e));
+      }
+      setIsPlaying(!isPlaying);
+    }
+  };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-pink-200 via-pink-300 to-purple-200">
+      {/* Decorative background elements */}
+      <div className="absolute inset-0 z-0 overflow-hidden">
+        {/* Animated bubbles */}
+        <div className="absolute top-1/4 left-1/4 w-32 h-32 rounded-full bg-pink-100 opacity-40 animate-pulse"></div>
+        <div
+          className="absolute top-3/4 left-1/2 w-24 h-24 rounded-full bg-purple-100 opacity-30 animate-pulse"
+          style={{ animationDelay: "1s" }}
+        ></div>
+        <div
+          className="absolute top-1/3 right-1/4 w-40 h-40 rounded-full bg-pink-100 opacity-30 animate-pulse"
+          style={{ animationDelay: "2s" }}
+        ></div>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+        {/* Shapes */}
+        <div className="absolute top-10 right-10 w-20 h-20 bg-purple-200 opacity-40 rounded-lg rotate-12"></div>
+        <div className="absolute bottom-20 left-10 w-16 h-16 bg-pink-200 opacity-50 rounded-lg -rotate-12"></div>
+
+        {/* Decorative patterns */}
+        <div className="absolute top-0 left-0 w-full h-full opacity-5">
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundImage:
+                "radial-gradient(circle, #ff9ec3 1px, transparent 1px)",
+              backgroundSize: "20px 20px",
+            }}
+          ></div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+      </div>
+
+      {/* Main content - centered and responsive */}
+      <div className="relative z-10 flex flex-col items-center justify-center w-full min-h-screen p-4">
+        <div className="p-6 md:p-8 text-center bg-white bg-opacity-80 backdrop-blur-sm rounded-xl shadow-lg w-full max-w-md mx-auto my-8">
+          <h1 className="text-3xl md:text-4xl font-bold text-pink-500 mb-3">
+            Chi è veramente Kasane Teto?? 🤔
+          </h1>
+          <p className="text-base md:text-lg text-pink-700 mb-4">
+            MISTERO RIVELATO!! 🕵️‍♀️ Organizzazioni internazionali cercano di
+            catturare questa creatura da anni! Hai informazioni segrete o vuoi
+            solo mandare un messaggio a Teto? Scrivilo qui sotto e forse ti
+            risponderà... (o forse no!) ✨
+          </p>
+
+          <button className="mt-4 px-6 py-3 bg-gradient-to-r from-pink-400 to-purple-400 text-white font-bold rounded-full transform transition-all duration-300 hover:scale-105 shadow-lg border-2 border-pink-300 hover:border-pink-200 focus:outline-none w-full md:w-auto">
+            <div className="flex items-center justify-center">
+              <span className="mr-2">✉️</span>
+              <span>Manda un messaggio a Teto!</span>
+              <span className="ml-2">💕</span>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      {/* Moving Teto images */}
+      {positions.map((pos) => (
+        <div
+          key={pos.id}
+          className="absolute pointer-events-none"
+          style={{
+            left: `${pos.x}%`,
+            top: `${pos.y}%`,
+            transform: `rotate(${pos.rotation}deg) scale(${pos.scale})`,
+            transition: "transform 0.5s ease-out",
+            zIndex: 0,
+          }}
         >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
+          <img
+            src="https://files.catbox.moe/9k10ff.png"
+            alt="tetooo"
+            className="w-12 h-12 md:w-16 md:h-16 object-contain"
+            loading="lazy"
           />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        </div>
+      ))}
+
+      {/* Audio control button - fixed position for mobile */}
+      <div className="fixed bottom-4 right-4 z-30">
+        <button
+          onClick={togglePlay}
+          className="bg-white bg-opacity-90 p-3 rounded-full shadow-lg border-2 border-pink-300 hover:border-pink-400 transition-all duration-300 transform hover:scale-110"
+          aria-label={isPlaying ? "Pause music" : "Play music"}
         >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+          {isPlaying ? (
+            <span className="text-xl md:text-2xl">🎵</span>
+          ) : (
+            <span className="text-xl md:text-2xl">🔇</span>
+          )}
+        </button>
+      </div>
+
+      {/* Flying heart decorations */}
+      <div
+        className="absolute top-1/3 left-10 animate-bounce text-2xl"
+        style={{ animationDuration: "3s" }}
+      >
+        💖
+      </div>
+      <div
+        className="absolute bottom-1/4 right-10 animate-bounce text-2xl"
+        style={{ animationDuration: "2.5s", animationDelay: "0.5s" }}
+      >
+        💗
+      </div>
+      <div
+        className="absolute top-1/4 right-1/4 animate-bounce text-2xl"
+        style={{ animationDuration: "4s", animationDelay: "1s" }}
+      >
+        💘
+      </div>
+
+      {/* Hidden audio element */}
+      <audio ref={audioRef} src="https://files.catbox.moe/0u7xhf.mp3" loop />
     </div>
   );
-}
+};
+
+export default CuteMovingImagesPage;
