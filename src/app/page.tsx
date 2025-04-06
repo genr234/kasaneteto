@@ -119,7 +119,14 @@ const CuteMovingImagesPage = () => {
             risponderà... (o forse no!) ✨
           </p>
 
-          <button className="mt-4 px-6 py-3 bg-gradient-to-r from-pink-400 to-purple-400 text-white font-bold rounded-full transform transition-all duration-300 hover:scale-105 shadow-lg border-2 border-pink-300 hover:border-pink-200 focus:outline-none w-full md:w-auto">
+          <button
+            className="mt-4 px-6 py-3 bg-gradient-to-r from-pink-400 to-purple-400 text-white font-bold rounded-full transform transition-all duration-300 hover:scale-105 shadow-lg border-2 border-pink-300 hover:border-pink-200 focus:outline-none w-full md:w-auto"
+            onClick={() =>
+              (window.location.href =
+                "https://forms.fillout.com/t/bdGyQEEPi6us")
+            }
+            aria-label="Send a message to Teto"
+          >
             <div className="flex items-center justify-center">
               <span className="mr-2">✉️</span>
               <span>Manda un messaggio a Teto!</span>
